@@ -1,7 +1,15 @@
 // _BYTE *a3 = Local<Script>* outScript
 // _BYTE *outScript = Local<Script>* outScript
 // Stream = fwRefContainer<vfs::Stream> or OMPtr<fxIStream>
-void __fastcall V8ScriptRuntime_181C0(Stream *stream, char *scriptFile, _BYTE *outScript)
+
+struct Script
+{
+	WCHAR* pwszScript;
+	WCHAR* pwszUsername;
+	WCHAR* pwszPassword;
+};
+
+void __fastcall V8ScriptRuntime_181C0(fwRefContainer<vfs::Stream> stream, char* scriptFile, Local<Script>* outScript /* Script* outScript */)
 {
   char *v4; // rdi
   Stream *v5; // r13
