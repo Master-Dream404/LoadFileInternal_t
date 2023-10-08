@@ -1,15 +1,7 @@
 // _BYTE *a3 = Local<Script>* outScript
 // _BYTE *outScript = Local<Script>* outScript
 // Stream = fwRefContainer<vfs::Stream> or OMPtr<fxIStream>
-
-struct Script
-{
-	WCHAR* pwszScript;
-	WCHAR* pwszUsername;
-	WCHAR* pwszPassword;
-};
-
-void __fastcall V8ScriptRuntime_181C0(fwRefContainer<vfs::Stream> stream, char* scriptFile, Local<Script>* outScript /* Script* outScript */)
+void __fastcall V8ScriptRuntime_181C0(fwRefContainer<vfs::Stream> stream, char* scriptFile, Script* outScript)
 {
   char *v4; // rdi
   Stream *v5; // r13
@@ -33,7 +25,7 @@ void __fastcall V8ScriptRuntime_181C0(fwRefContainer<vfs::Stream> stream, char* 
   __int64 v23; // rcx
   unsigned __int64 v24; // r8
   void **v25; // r9
-  _QWORD *v26; // rsi
+  _QWORD *m_state; // rsi
   const char *v27; // rbx
   __int64 v28; // r10
   void *v29; // rcx
@@ -48,8 +40,8 @@ void __fastcall V8ScriptRuntime_181C0(fwRefContainer<vfs::Stream> stream, char* 
   __int64 v38; // r13
   __int64 v39; // r14
   __int64 v40; // rax
-  int v41; // eax
-  int *v42; // rdi
+  int idIt; // eax
+  int *numProtos; // rdi
   __int64 v43; // r12
   __int64 v44; // rcx
   __int64 v45; // rbx
@@ -99,7 +91,7 @@ void __fastcall V8ScriptRuntime_181C0(fwRefContainer<vfs::Stream> stream, char* 
   __int64 v89; // [rsp+160h] [rbp-108h]
   unsigned __int64 v90; // [rsp+168h] [rbp-100h]
   __int128 v91[3]; // [rsp+170h] [rbp-F8h] BYREF
-  char v92[128]; // [rsp+1A0h] [rbp-C8h] BYREF
+  char debug[128]; // [rsp+1A0h] [rbp-C8h] BYREF
 
   v83 = 0xFFFFFFFFFFFFFFFEui64;
   v4 = scriptFile;
@@ -262,12 +254,12 @@ LABEL_36:
   v25 = Src;
   if ( v90 >= 0x10 )
     LODWORD(v25) = Src[0];
-  v26 = (_QWORD *)((char *)v5 + 0x58);
+  m_state = (_QWORD *)((char *)v5 + 0x58);
   v68 = (void **)((char *)v5 + 0x58);
   if ( (unsigned int)luaL_loadbuffer_2B260(*((_QWORD *)v5 + 0xB), v71[0], v78, (_DWORD)v25, 0i64) )
   {
     v27 = "error object is not a string";
-    if ( (unsigned int)sub_2D3D0(*v26, 0xFFFFFFFFi64) == 8 )
+    if ( (unsigned int)sub_2D3D0(*m_state, 0xFFFFFFFFi64) == 8 )
       v27 = (const char *)sub_2DCD0(v28, 0xFFFFFFFFi64, 0i64);
     v74 = (char *)&unk_9D02E;
     (*(void (__fastcall **)(_QWORD, char **))(**((_QWORD **)v5 + 0xF) + 0x18i64))(*((_QWORD *)v5 + 0xF), &v74);
@@ -284,7 +276,7 @@ LABEL_36:
     *((_QWORD *)&v77 + 1) = v91;
     *(_OWORD *)Block = v77;
     ScriptTrace_128C0("Error parsing script %s in resource %s: %s\n", Block);// ScriptTrace("Error parsing script %s in resource %s: %s\n", scriptFile, GetResourceName(), *str);
-    *(_QWORD *)(*v26 + 0x10i64) -= 0x20i64;
+    *(_QWORD *)(*m_state + 0x10i64) -= 0x20i64;
     if ( v90 < 0x10 )
       goto LABEL_61;
     v29 = Src[0];
@@ -360,33 +352,33 @@ LABEL_122:
       *(_OWORD *)v79 = 0i64;
       v39 = 0i64;
       v80 = 0i64;
-      v40 = *(_QWORD *)(*v26 + 0x10i64);
+      v40 = *(_QWORD *)(*m_state + 0x10i64);
       if ( *(_DWORD *)(v40 - 0x10) == 0x4A )
-        v41 = sub_2D1F0(*v26, *(_QWORD *)(*(_QWORD *)(v40 - 0x20) + 0x18i64));
+        idIt = sub_2D1F0(*m_state, *(_QWORD *)(*(_QWORD *)(v40 - 0x20) + 0x18i64));
       else
-        v41 = 0;
-      v42 = (int *)v79[1];
-      if ( v41 > 0 )
+        idIt = 0;
+      numProtos = (int *)v79[1];
+      if ( idIt > 0 )
       {
-        v43 = (unsigned int)v41;
+        v43 = (unsigned int)idIt;
         do
         {
-          lua_getinfo_62690(*v26, ">L", v92);
-          v44 = *v26;
-          *(_DWORD *)(*(_QWORD *)(*v26 + 0x10i64) + 0x10i64) = 0;
+          lua_getinfo_62690(*m_state, ">L", debug);
+          v44 = *m_state;
+          *(_DWORD *)(*(_QWORD *)(*m_state + 0x10i64) + 0x10i64) = 0;
           *(_QWORD *)(v44 + 0x10) += 0x20i64;
           while ( 1 )
           {
-            v45 = *v26;
+            v45 = *m_state;
             v46 = sub_6BC40(
-                    *v26,
-                    *(_QWORD *)(*(_QWORD *)(*v26 + 0x10i64) - 0x40i64),
-                    *(_QWORD *)(*v26 + 0x10i64) - 0x20i64);
+                    *m_state,
+                    *(_QWORD *)(*(_QWORD *)(*m_state + 0x10i64) - 0x40i64),
+                    *(_QWORD *)(*m_state + 0x10i64) - 0x20i64);
             v47 = *(_QWORD *)(v45 + 0x10);
             if ( !v46 )
               break;
             *(_QWORD *)(v45 + 0x10) = v47 + 0x20;
-            v48 = *(_QWORD *)(*v26 + 0x10i64) - 0x40i64;
+            v48 = *(_QWORD *)(*m_state + 0x10i64) - 0x40i64;
             if ( *(_DWORD *)(v48 + 0x10) == 0x13 )
             {
               v49 = *(_BYTE **)v48;
@@ -400,21 +392,21 @@ LABEL_122:
             }
             v73 = v49;
             LODWORD(v69) = (_DWORD)v49 - 1;
-            if ( v42 == (int *)v39 )
+            if ( numProtos == (int *)v39 )
             {
-              sub_256B0(v79, v42, &v69);
+              sub_256B0(v79, numProtos, &v69);
               v39 = v80;
-              v42 = (int *)v79[1];
+              numProtos = (int *)v79[1];
             }
             else
             {
-              *v42++ = (_DWORD)v49 - 1;
-              v79[1] = v42;
+              *numProtos++ = (_DWORD)v49 - 1;
+              v79[1] = numProtos;
             }
-            *(_QWORD *)(*v26 + 0x10i64) -= 0x20i64;
+            *(_QWORD *)(*m_state + 0x10i64) -= 0x20i64;
           }
           *(_QWORD *)(v45 + 0x10) = v47 - 0x20;
-          *(_QWORD *)(*v26 + 0x10i64) -= 0x20i64;
+          *(_QWORD *)(*m_state + 0x10i64) -= 0x20i64;
           --v43;
         }
         while ( v43 );
@@ -426,7 +418,7 @@ LABEL_122:
         v75 = 1;
         v51 = (char *)v79[0];
         v52 = (int *)v79[0];
-        if ( v79[0] != v42 )
+        if ( v79[0] != numProtos )
         {
           do
           {
@@ -471,7 +463,7 @@ LABEL_122:
             sub_1D830(&v70, (unsigned __int8)v69);
             ++v52;
           }
-          while ( v52 != v42 );
+          while ( v52 != numProtos );
           v38 = (__int64)v76;
         }
         v57 = *(_QWORD *)(v38 + 0x88);
